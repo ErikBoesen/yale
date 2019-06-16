@@ -18,7 +18,7 @@ credentials = {
 }
 if os.path.isfile(CREDENTIALS_PATH) and os.path.getsize(CREDENTIALS_PATH) is not 0:
     with open(CREDENTIALS_PATH, 'r') as f:
-        credentials = yaml.load(f, loader=yaml.SafeLoader)
+        credentials = yaml.load(f, Loader=yaml.SafeLoader)
 else:
     credentials['NetID'] = input('NetID: ')
     from getpass import getpass
@@ -47,8 +47,9 @@ else:
 
 if args.verb == 'dining':
     response = requests.get('http://www.yaledining.org/fasttrack/locations.cfm?version=3').json()
-    for location in response['DATA']:
-        for index, value in enumerate(location):
-            print('{column}: {value}'.format(column=response['COLUMNS'][index],
-                                             value=value))
-        print()
+    # Reshuffle into list of dicts for easy subscripting
+    locations = [
+        {response['COLUMNS'][index]: entry[index] for index in range(len(entry))}
+        for entry in response['DATA']
+    ]
+    print(locations)
