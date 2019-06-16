@@ -5,7 +5,7 @@ import yaml
 import stat
 import sys
 import requests
-from termcolor import colored
+from termcolor import colored, cprint
 
 parser = argparse.ArgumentParser(description='Perform Yale-related tasks')
 parser.add_argument('verb')
@@ -36,7 +36,7 @@ config = {
 }
 if os.path.isfile(CONFIG_PATH) and os.path.getsize(CONFIG_PATH) is not 0:
     with open(CONFIG_PATH, 'r') as f:
-        config = yaml.load(f)
+        config = yaml.load(f, Loader=yaml.SafeLoader)
 else:
     config = {key: input(key + ': ') for key in config.keys()}
     config.update({
@@ -52,4 +52,6 @@ if args.verb == 'dining':
         {response['COLUMNS'][index]: entry[index] for index in range(len(entry))}
         for entry in response['DATA']
     ]
-    print(locations)
+    for location in locations:
+        cprint(location['DININGLOCATIONNAME'], 'red' if bool(location['ISCLOSED']) else 'green')
+
