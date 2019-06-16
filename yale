@@ -58,4 +58,7 @@ if args.verb == 'dining':
     }
     for location in locations:
         cprint(type_symbols[location['TYPE']] + ' ' + location['DININGLOCATIONNAME'], 'red' if bool(location['ISCLOSED']) else 'green')
+        print('Address: ' + location['ADDRESS'])
+        print('Managers: ' + ', '.join(['{name} ({email})'.format(name=location['MANAGER1NAME'],
+                                                                  email=location['MANAGER1EMAIL'])
 
