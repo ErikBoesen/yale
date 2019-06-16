@@ -9,6 +9,7 @@ from termcolor import colored, cprint
 
 parser = argparse.ArgumentParser(description='Perform Yale-related tasks')
 parser.add_argument('verb')
+parser.add_argument('--debug', default=False, action='store_true', help='Output debug information')
 args = parser.parse_args()
 
 CREDENTIALS_PATH = os.path.expanduser('~') + '/.yale_credentials.yml'
@@ -45,6 +46,14 @@ else:
     with open(CONFIG_PATH, 'w') as f:
         yaml.dump(config, f)
 
+def debug(content):
+    """
+    Log debug output if enabled.
+    :param content: content to log
+    """
+    if args.debug:
+        print(content)
+
 def get_managers(location):
     managers = []
     num_managers = 0
@@ -69,7 +78,8 @@ if args.verb == 'dining':
         'Retail': '💰',
     }
     for location in locations:
-        cprint(type_symbols[location['TYPE']] + ' ' + location['DININGLOCATIONNAME'], 'red' if bool(location['ISCLOSED']) else 'green')
+        is_open = not bool(location['ISCLOSED'])
+        cprint(type_symbols[location['TYPE']] + ' ' + location['DININGLOCATIONNAME'], 'green' if is_open else 'red')
         print('Address: ' + location['ADDRESS'])
         print('Managers: ' + get_managers(location))
 
