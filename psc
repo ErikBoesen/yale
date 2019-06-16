@@ -18,7 +18,7 @@ credentials = {
 }
 if os.path.isfile(CREDENTIALS_PATH) and os.path.getsize(CREDENTIALS_PATH) is not 0:
     with open(CREDENTIALS_PATH, 'r') as f:
-        credentials = yaml.load(f)
+        credentials = yaml.load(f, loader=yaml.SafeLoader)
 else:
     credentials['NetID'] = input('NetID: ')
     from getpass import getpass
