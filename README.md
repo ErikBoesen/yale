@@ -18,7 +18,7 @@ To uninstall:
 ```sh
 make uninstall
 ```
-Any of these commands may require root privileges depending on your environment.
+Any of these commands may require root privileges depending on your environment. However, since this is no longer high school, that shouldn't be a problem, right?
 
 ## Use
 TODO
@@ -30,4 +30,4 @@ At first run, your credentials will be requested and saved to `~/.psc_credential
 [MIT](LICENSE)
 
 ## Author
-[Erik Boesen](https://github.com/ErikBoesen)
+Created by [Erik Boesen](https://github.com/ErikBoesen) '23. Partially inspired by [cornell-cli](https://github.com/mrkev/cornell).
