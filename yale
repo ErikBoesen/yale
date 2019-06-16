@@ -62,7 +62,7 @@ def capacity_color(capacity):
 def capacity_bar(is_open, capacity):
     if not is_open:
         return ''
-    return colorize(('▇' * capacity) + ('░' * (10 - capacity)),
+    return colored(('▇' * capacity) + ('░' * (10 - capacity)), capacity_color(capacity))
 
 def get_managers(location):
     managers = []
