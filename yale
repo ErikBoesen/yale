@@ -85,13 +85,27 @@ def get_managers(location):
         managers.append(manager)
     return ', '.join([f'{name} ({email})' for name, email in managers])
 
+def dining_get(endpoint, version=3, make_list=True, params={}):
+    custom_params = {
+        'version': version,
+    }
+    custom_params.update(params)
+    request = requests.get('http://www.yaledining.org/fasttrack/locations.cfm', params=custom_params)
+    if request.ok:
+        data = request.json()
+        if make_list:
+            data = [
+                {response['COLUMNS'][index]: entry[index] for index in range(len(entry))}
+                for entry in response['DATA']
+            ]
+        return data
+    else:
+        # TODO: actually say what's wrong
+        raise Exception
+
 if args.subcommand == 'dining':
-    response = requests.get('http://www.yaledining.org/fasttrack/locations.cfm?version=3').json()
+    response = dining_get('locations.cfm')
     # Reshuffle into list of dicts for easy subscripting
-    locations = [
-        {response['COLUMNS'][index]: entry[index] for index in range(len(entry))}
-        for entry in response['DATA']
-    ]
     type_symbols = {
         'Residential': '🏠',
         'Retail': '💰',
@@ -114,8 +128,8 @@ if args.subcommand == 'dining':
             if args.location == location['DININGLOCATIONNAME']:
                 location_id = location['ID_LOCATION']
         if location_id is None:
-            error(f"Unknown location name.")
-        response = requests.get(f'http://www.yaledining.org/fasttrack/menus.cfm?location={location_id}&version=3').json()
+            error(f'Unknown location name.')
+        response = dining_get('menus.cfm', params={'location': location_id})
         print(response)
 elif args.subcommand == 'class':
     pass
