@@ -54,6 +54,16 @@ def debug(content):
     if args.debug:
         print(content)
 
+def capacity_color(capacity):
+    if capacity > 7: return 'red'
+    if capacity > 5: return 'yellow'
+    return 'green'
+
+def capacity_bar(is_open, capacity):
+    if not is_open:
+        return ''
+    return colorize(('▇' * capacity) + ('░' * (10 - capacity)),
+
 def get_managers(location):
     managers = []
     num_managers = 0
@@ -78,8 +88,14 @@ if args.verb == 'dining':
         'Retail': '💰',
     }
     for location in locations:
+        debug(location)
         is_open = not bool(location['ISCLOSED'])
-        cprint(type_symbols[location['TYPE']] + ' ' + location['DININGLOCATIONNAME'], 'green' if is_open else 'red')
-        print('Address: ' + location['ADDRESS'])
-        print('Managers: ' + get_managers(location))
+        print(colored(type_symbols[location['TYPE']] + ' ' + location['DININGLOCATIONNAME'], 'green' if is_open else 'red'), end='')
+        print(' ' + capacity_bar(is_open, location['CAPACITY']))
+        if is_open:
+            print(' - Address: {address} ({coordinates})'.format(address=location['ADDRESS'],
+                                                              coordinates=location['GEOLOCATION']))
+            print(' - Phone: ' + location['PHONE'])
+            print(' - Managers: ' + get_managers(location))
+            print()
 
