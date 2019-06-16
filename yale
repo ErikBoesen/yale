@@ -8,11 +8,12 @@ import requests
 from termcolor import colored, cprint
 
 parser = argparse.ArgumentParser(description='Perform Yale-related tasks')
-subparsers = parser.add_subparsers(help='Subcommand help')
+subparsers = parser.add_subparsers(help='Subcommand help', dest='subcommand')
 parser_dining = subparsers.add_parser('dining')
-parser_dining.add_argument('location')
+parser_dining.add_argument('location', nargs='?')
 parser.add_argument('--debug', default=False, action='store_true', help='Output debug information')
 args = parser.parse_args()
+
 CREDENTIALS_PATH = os.path.expanduser('~') + '/.yale_credentials.yml'
 credentials = {
     'NetID': '',
@@ -77,7 +78,7 @@ def get_managers(location):
         managers.append(manager)
     return ', '.join([f'{name} ({email})' for name, email in managers])
 
-if args.verb == 'dining':
+if args.subcommand == 'dining':
     response = requests.get('http://www.yaledining.org/fasttrack/locations.cfm?version=3').json()
     # Reshuffle into list of dicts for easy subscripting
     locations = [
