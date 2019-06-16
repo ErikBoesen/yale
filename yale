@@ -90,21 +90,24 @@ def dining_get(endpoint, version=3, make_list=True, params={}):
         'version': version,
     }
     custom_params.update(params)
-    request = requests.get('http://www.yaledining.org/fasttrack/locations.cfm', params=custom_params)
+    request = requests.get('http://www.yaledining.org/fasttrack/' + endpoint, params=custom_params)
     if request.ok:
         data = request.json()
         if make_list:
             data = [
-                {response['COLUMNS'][index]: entry[index] for index in range(len(entry))}
-                for entry in response['DATA']
+                {data['COLUMNS'][index]: entry[index] for index in range(len(entry))}
+                for entry in data['DATA']
             ]
         return data
     else:
         # TODO: actually say what's wrong
         raise Exception
 
+def bullet(title, details):
+    print(' ' * 4 + colored(title + ': ', 'blue') + details)
+
 if args.subcommand == 'dining':
-    response = dining_get('locations.cfm')
+    locations = dining_get('locations.cfm')
     # Reshuffle into list of dicts for easy subscripting
     type_symbols = {
         'Residential': '🏠',
@@ -117,11 +120,10 @@ if args.subcommand == 'dining':
             print(colored(type_symbols[location['TYPE']] + ' ' + location['DININGLOCATIONNAME'], 'green' if is_open else 'red'), end='')
             print(' ' + capacity_bar(is_open, location['CAPACITY']))
             if is_open:
-                print(' - Address: {address} ({coordinates})'.format(address=location['ADDRESS'],
+                bullet('Address', '{address} ({coordinates})'.format(address=location['ADDRESS'],
                                                                   coordinates=location['GEOLOCATION']))
-                print(' - Phone: ' + location['PHONE'])
-                print(' - Managers: ' + get_managers(location))
-                print()
+                bullet('Phone', location['PHONE'])
+                bullet('Managers', get_managers(location))
     else:
         location_id = None
         for location in locations:
