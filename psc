@@ -33,9 +33,6 @@ if os.stat(CREDENTIALS_PATH).st_mode & (stat.S_IRGRP | stat.S_IROTH):
 
 CONFIG_PATH = os.path.expanduser('~') + '/.yale.yml'
 config = {
-    # Such as ps.fccps.org
-    'host': '',
-    # Additional, nonessential properties will be added later if generating config.
 }
 if os.path.isfile(CONFIG_PATH) and os.path.getsize(CONFIG_PATH) is not 0:
     with open(CONFIG_PATH, 'r') as f:
@@ -47,3 +44,11 @@ else:
     })
     with open(CONFIG_PATH, 'w') as f:
         yaml.dump(config, f)
+
+if args.verb == 'dining':
+    response = requests.get('http://www.yaledining.org/fasttrack/locations.cfm?version=3').json()
+    for location in response['DATA']:
+        for index, value in enumerate(location):
+            print('{column}: {value}'.format(column=response['COLUMNS'][index],
+                                             value=value))
+        print()
