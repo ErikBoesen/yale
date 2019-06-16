@@ -6,6 +6,7 @@ import stat
 import sys
 import requests
 from termcolor import colored, cprint
+import yaledining
 
 parser = argparse.ArgumentParser(description='Perform Yale-related tasks')
 subparsers = parser.add_subparsers(help='Subcommand help', dest='subcommand', required=True)
@@ -85,29 +86,12 @@ def get_managers(location):
         managers.append(manager)
     return ', '.join([f'{name} ({email})' for name, email in managers])
 
-def dining_get(endpoint, version=3, make_list=True, params={}):
-    custom_params = {
-        'version': version,
-    }
-    custom_params.update(params)
-    request = requests.get('http://www.yaledining.org/fasttrack/' + endpoint, params=custom_params)
-    if request.ok:
-        data = request.json()
-        if make_list:
-            data = [
-                {data['COLUMNS'][index]: entry[index] for index in range(len(entry))}
-                for entry in data['DATA']
-            ]
-        return data
-    else:
-        # TODO: actually say what's wrong
-        raise Exception
-
 def bullet(title, details):
     print(' ' * 4 + colored(title + ': ', 'blue') + details)
 
 if args.subcommand == 'dining':
-    locations = dining_get('locations.cfm')
+    dining = yaledining.YaleDining()
+    locations = dining.get_locations()
     # Reshuffle into list of dicts for easy subscripting
     type_symbols = {
         'Residential': '🏠',
@@ -131,7 +115,9 @@ if args.subcommand == 'dining':
                 location_id = location['ID_LOCATION']
         if location_id is None:
             error(f'Unknown location name.')
-        response = dining_get('menus.cfm', params={'location': location_id})
+        menus = dining.get_menus(location_id)
+        # TODO: finish that...
+        print('Menu lookup is WIP')
         print(response)
 elif args.subcommand == 'class':
     pass
