@@ -52,6 +52,10 @@ if args.verb == 'dining':
         {response['COLUMNS'][index]: entry[index] for index in range(len(entry))}
         for entry in response['DATA']
     ]
+    type_symbols = {
+        'Residential': '🏠',
+        'Retail': '💰',
+    }
     for location in locations:
-        cprint(location['DININGLOCATIONNAME'], 'red' if bool(location['ISCLOSED']) else 'green')
+        cprint(type_symbols[location['TYPE']] + ' ' + location['DININGLOCATIONNAME'], 'red' if bool(location['ISCLOSED']) else 'green')
 
