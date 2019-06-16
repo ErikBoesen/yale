@@ -89,14 +89,26 @@ if args.subcommand == 'dining':
         'Residential': '🏠',
         'Retail': '💰',
     }
-    for location in locations:
-        debug(location)
-        is_open = not bool(location['ISCLOSED'])
-        print(colored(type_symbols[location['TYPE']] + ' ' + location['DININGLOCATIONNAME'], 'green' if is_open else 'red'), end='')
-        print(' ' + capacity_bar(is_open, location['CAPACITY']))
-        if is_open:
-            print(' - Address: {address} ({coordinates})'.format(address=location['ADDRESS'],
-                                                              coordinates=location['GEOLOCATION']))
-            print(' - Phone: ' + location['PHONE'])
-            print(' - Managers: ' + get_managers(location))
-            print()
+    if args.location is None:
+        for location in locations:
+            debug(location)
+            is_open = not bool(location['ISCLOSED'])
+            print(colored(type_symbols[location['TYPE']] + ' ' + location['DININGLOCATIONNAME'], 'green' if is_open else 'red'), end='')
+            print(' ' + capacity_bar(is_open, location['CAPACITY']))
+            if is_open:
+                print(' - Address: {address} ({coordinates})'.format(address=location['ADDRESS'],
+                                                                  coordinates=location['GEOLOCATION']))
+                print(' - Phone: ' + location['PHONE'])
+                print(' - Managers: ' + get_managers(location))
+                print()
+    else:
+        location_id = None
+        for location in locations:
+            if args.location == location['DININGLOCATIONNAME']:
+                location_id = location['ID_LOCATION']
+        if location_id is None:
+            error(f"Unknown location name.")
+        response = requests.get(f'http://www.yaledining.org/fasttrack/menus.cfm?location={location_id}&version=3').json()
+        print(response)
+elif args.subcommand == 'class':
+    pass
