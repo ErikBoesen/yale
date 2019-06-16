@@ -45,6 +45,18 @@ else:
     with open(CONFIG_PATH, 'w') as f:
         yaml.dump(config, f)
 
+def get_managers(location):
+    managers = []
+    num_managers = 0
+    while num_managers < 4:
+        num_managers += 1
+        manager = (location[f'MANAGER{num_managers}NAME'],
+                   location[f'MANAGER{num_managers}EMAIL'])
+        if manager == (None, None):
+            break
+        managers.append(manager)
+    return ', '.join([f'{name} ({email})' for name, email in managers])
+
 if args.verb == 'dining':
     response = requests.get('http://www.yaledining.org/fasttrack/locations.cfm?version=3').json()
     # Reshuffle into list of dicts for easy subscripting
@@ -59,6 +71,5 @@ if args.verb == 'dining':
     for location in locations:
         cprint(type_symbols[location['TYPE']] + ' ' + location['DININGLOCATIONNAME'], 'red' if bool(location['ISCLOSED']) else 'green')
         print('Address: ' + location['ADDRESS'])
-        print('Managers: ' + ', '.join(['{name} ({email})'.format(name=location['MANAGER1NAME'],
-                                                                  email=location['MANAGER1EMAIL'])
+        print('Managers: ' + get_managers(location))
 
