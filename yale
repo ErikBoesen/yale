@@ -56,6 +56,13 @@ def debug(content):
     if args.debug:
         print(content)
 
+def error(content):
+    """
+    Log errors.
+    :param content: content to log
+    """
+    print(colored(content, 'red'), file=sys.stderr)
+
 def capacity_color(capacity):
     if capacity > 7: return 'red'
     if capacity > 5: return 'yellow'
