@@ -8,7 +8,7 @@ import requests
 from termcolor import colored, cprint
 
 parser = argparse.ArgumentParser(description='Perform Yale-related tasks')
-subparsers = parser.add_subparsers(help='Subcommand help', dest='subcommand')
+subparsers = parser.add_subparsers(help='Subcommand help', dest='subcommand', required=True)
 parser_dining = subparsers.add_parser('dining')
 parser_dining.add_argument('location', nargs='?')
 parser.add_argument('--debug', default=False, action='store_true', help='Output debug information')
