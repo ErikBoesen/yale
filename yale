@@ -70,7 +70,7 @@ def capacity_color(capacity):
     return 'green'
 
 def capacity_bar(is_open, capacity):
-    if not is_open:
+    if not is_open or capacity is None:
         return ''
     return colored(('▇' * capacity) + ('░' * (10 - capacity)), capacity_color(capacity))
 
@@ -118,6 +118,6 @@ if args.subcommand == 'dining':
         menus = dining.get_menus(location_id)
         # TODO: finish that...
         print('Menu lookup is WIP')
-        print(response)
+        print(menus)
 elif args.subcommand == 'class':
     pass
