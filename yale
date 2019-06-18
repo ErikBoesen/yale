@@ -69,7 +69,9 @@ def capacity_color(capacity):
     if capacity > 5: return 'yellow'
     return 'green'
 
-def capacity_bar(capacity):
+def capacity_bar(open, capacity):
+    if not open or capacity is None:
+        return ''
     return colored(('▇' * capacity) + ('░' * (10 - capacity)), capacity_color(capacity))
 
 def bullet(title, details):
@@ -83,19 +85,14 @@ if args.subcommand == 'dining':
         'Retail': '💰',
     }
     if args.location is None:
-        locations = dining.locations()
-        for location in locations:
+        for location in dining.locations():
             debug(location)
-            print(colored(type_symbols[location.type] + ' ' + location.name, 'green' if location.open else 'red'), end='')
+            print(colored(type_symbols[location.type] + ' ' + location.name, 'green' if location.open else 'red') + ' ' + capacity_bar(location.open, location.capacity))
             if location.open:
-                print(' ' + capacity_bar(location.open, location.capacity))
                 bullet('Address', '{address} ({coordinates})'.format(address=location.address,
                                                                      coordinates=location.geolocation))
                 bullet('Phone', location.phone)
-                bullet('Managers', ', '.join([f'{manager.name} ({manager.email})' for manager in managers]))
-            else:
-                # TODO: this is messy
-                print()
+                bullet('Managers', ', '.join([f'{manager.name} ({manager.email})' for manager in location.managers]))
     else:
         location = dining.location(name=args.location)
         if location is None:
