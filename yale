@@ -91,7 +91,7 @@ def bullet(title, details):
 
 if args.subcommand == 'dining':
     dining = yaledining.YaleDining()
-    locations = dining.get_locations()
+    locations = dining.locations()
     # Reshuffle into list of dicts for easy subscripting
     type_symbols = {
         'Residential': '🏠',
@@ -100,13 +100,12 @@ if args.subcommand == 'dining':
     if args.location is None:
         for location in locations:
             debug(location)
-            is_open = not bool(location['ISCLOSED'])
-            print(colored(type_symbols[location['TYPE']] + ' ' + location['DININGLOCATIONNAME'], 'green' if is_open else 'red'), end='')
-            print(' ' + capacity_bar(is_open, location['CAPACITY']))
+            print(colored(type_symbols[location.type] + ' ' + location.name, 'green' if location.open else 'red'), end='')
+            print(' ' + capacity_bar(location.open, location.capacity))
             if is_open:
-                bullet('Address', '{address} ({coordinates})'.format(address=location['ADDRESS'],
-                                                                  coordinates=location['GEOLOCATION']))
-                bullet('Phone', location['PHONE'])
+                bullet('Address', '{address} ({coordinates})'.format(address=location.address,
+                                                                     coordinates=location.geolocation))
+                bullet('Phone', location.phone)
                 bullet('Managers', get_managers(location))
     else:
         location_id = None
