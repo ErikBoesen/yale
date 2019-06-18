@@ -69,9 +69,7 @@ def capacity_color(capacity):
     if capacity > 5: return 'yellow'
     return 'green'
 
-def capacity_bar(is_open, capacity):
-    if not is_open or capacity is None:
-        return ''
+def capacity_bar(capacity):
     return colored(('▇' * capacity) + ('░' * (10 - capacity)), capacity_color(capacity))
 
 def bullet(title, details):
@@ -89,16 +87,19 @@ if args.subcommand == 'dining':
         for location in locations:
             debug(location)
             print(colored(type_symbols[location.type] + ' ' + location.name, 'green' if location.open else 'red'), end='')
-            print(' ' + capacity_bar(location.open, location.capacity))
-            if is_open:
+            if location.open:
+                print(' ' + capacity_bar(location.open, location.capacity))
                 bullet('Address', '{address} ({coordinates})'.format(address=location.address,
                                                                      coordinates=location.geolocation))
                 bullet('Phone', location.phone)
                 bullet('Managers', ', '.join([f'{manager.name} ({manager.location})' for manager in managers]))
+            else:
+                # TODO: this is messy
+                print()
     else:
         location = dining.location(name=args.location)
         if location is None:
-            error(f'Unknown location name.')
+            error('Unknown location name.')
         menus = location.menus
         # TODO: finish that...
         print('Menu lookup is WIP')
