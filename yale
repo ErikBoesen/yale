@@ -92,7 +92,7 @@ if args.subcommand == 'dining':
                 bullet('Address', '{address} ({coordinates})'.format(address=location.address,
                                                                      coordinates=location.geolocation))
                 bullet('Phone', location.phone)
-                bullet('Managers', ', '.join([f'{manager.name} ({manager.location})' for manager in managers]))
+                bullet('Managers', ', '.join([f'{manager.name} ({manager.email})' for manager in managers]))
             else:
                 # TODO: this is messy
                 print()
