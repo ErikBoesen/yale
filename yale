@@ -91,13 +91,13 @@ def bullet(title, details):
 
 if args.subcommand == 'dining':
     dining = yaledining.YaleDining()
-    locations = dining.locations()
     # Reshuffle into list of dicts for easy subscripting
     type_symbols = {
         'Residential': '🏠',
         'Retail': '💰',
     }
     if args.location is None:
+        locations = dining.locations()
         for location in locations:
             debug(location)
             print(colored(type_symbols[location.type] + ' ' + location.name, 'green' if location.open else 'red'), end='')
@@ -106,15 +106,12 @@ if args.subcommand == 'dining':
                 bullet('Address', '{address} ({coordinates})'.format(address=location.address,
                                                                      coordinates=location.geolocation))
                 bullet('Phone', location.phone)
-                bullet('Managers', get_managers(location))
+                bullet('Managers', ', '.join([f'{manager.name} ({manager.location})' for manager in managers]))
     else:
-        location_id = None
-        for location in locations:
-            if args.location == location['DININGLOCATIONNAME']:
-                location_id = location['ID_LOCATION']
-        if location_id is None:
+        location = dining.location(name=args.location)
+        if location is None:
             error(f'Unknown location name.')
-        menus = dining.get_menus(location_id)
+        menus = location.menus
         # TODO: finish that...
         print('Menu lookup is WIP')
         print(menus)
