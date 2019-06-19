@@ -101,12 +101,16 @@ if args.subcommand == 'dining':
         location = dining.location(args.location)
         if location is None:
             error('Unknown location name.')
+        print(colored('/' * 3 + ' ' + location.name + ' ' + '/' * 3, 'blue'))
+        print()
         bullet('Address', '{address} ({coordinates})'.format(address=location.address,
                                                              coordinates=location.geolocation))
         bullet('Phone', location.phone)
         bullet_list('Managers', [f'{manager.name} ({manager.email})' for manager in location.managers])
         print()
         meal = location.meals[0]
-        print(colored(meal.date.strftime('%m/%d') + ' / ' + meal.name, attrs=['underline']))
+        print(colored(meal.date.strftime('%m/%d') + ' / ' + meal.name, 'blue', attrs=['underline']))
+        for item in meal.items:
+            print('- ' + item.name)
 elif args.subcommand == 'class':
     pass
