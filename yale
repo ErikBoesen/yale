@@ -104,7 +104,7 @@ if args.subcommand == 'dining':
         bullet('Address', '{address} ({coordinates})'.format(address=location.address,
                                                              coordinates=location.geolocation))
         bullet('Phone', location.phone)
-        bullet('Managers', ', '.join([f'{manager.name} ({manager.email})' for manager in location.managers]))
+        bullet_list('Managers', [f'{manager.name} ({manager.email})' for manager in location.managers])
         print()
         meal = location.meals[0]
         print(colored(meal.date.strftime('%m/%d') + ' / ' + meal.name, attrs=['underline']))
