@@ -107,10 +107,10 @@ if args.subcommand == 'dining':
                                                              coordinates=location.geolocation))
         bullet('Phone', location.phone)
         bullet_list('Managers', [f'{manager.name} ({manager.email})' for manager in location.managers])
-        print()
-        meal = location.meals[0]
-        print(colored(meal.date.strftime('%m/%d') + ' / ' + meal.name, 'blue', attrs=['underline']))
-        for item in meal.items:
-            print('- ' + item.name)
+        for meal in location.meals:
+            print()
+            print(colored(meal.date.strftime('%m/%d') + ' / ' + meal.name, 'blue', attrs=['underline']))
+            for item in meal.items:
+                print('- ' + item.name)
 elif args.subcommand == 'class':
     pass
