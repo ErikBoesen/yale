@@ -7,18 +7,22 @@ import sys
 import requests
 from termcolor import colored, cprint
 import yaledining
+import yalecourses
 
 parser = argparse.ArgumentParser(description='Perform Yale-related tasks')
+parser.add_argument('--debug', default=False, action='store_true', help='Output debug information')
 subparsers = parser.add_subparsers(help='Subcommand help', dest='subcommand', required=True)
 parser_dining = subparsers.add_parser('dining')
 parser_dining.add_argument('location', nargs='?')
-parser.add_argument('--debug', default=False, action='store_true', help='Output debug information')
+parser_courses = subparsers.add_parser('courses')
+parser_courses.add_argument('identifier', nargs='?')
 args = parser.parse_args()
 
 CREDENTIALS_PATH = os.path.expanduser('~') + '/.yale_credentials.yml'
 credentials = {
     'NetID': '',
     'Password': '',
+    'api_key': '',
 }
 if os.path.isfile(CREDENTIALS_PATH) and os.path.getsize(CREDENTIALS_PATH) is not 0:
     with open(CREDENTIALS_PATH, 'r') as f:
@@ -29,6 +33,7 @@ else:
     credentials['Password'] = getpass('Password: ')
     with open(CREDENTIALS_PATH, 'w') as f:
         yaml.dump(credentials, f)
+    credentials['yale_api_key'] = input('Yale API key (go to https://yale.dev.ca.com/admin/app/applications and add an application): ')
     os.chmod(CREDENTIALS_PATH, stat.S_IRUSR | stat.S_IWUSR)
 
 # Warn if group or public can read config and the private details therein.
@@ -74,7 +79,7 @@ def capacity_bar(open, capacity):
         return ''
     return colored(('▇' * capacity) + ('░' * (10 - capacity)), capacity_color(capacity))
 
-def bullet(title, details: str):
+def bullet(title, details: str = ''):
     print(colored(title + ': ', 'blue') + details)
 
 def bullet_list(title, details: list):
@@ -112,5 +117,25 @@ if args.subcommand == 'dining':
             print(colored(meal.date.strftime('%m/%d') + ' / ' + meal.name, 'blue', attrs=['underline']))
             for item in meal.items:
                 print('- ' + item.name)
-elif args.subcommand == 'class':
-    pass
+elif args.subcommand == 'course':
+    api = yalecourses.YaleCourses(config['yale_api_key'])
+    if api.is_course(args.identifier):
+        courses = api.courses(args.identifier)
+        if not courses:
+            print(query + ' is not a recognized subject.')
+        else:
+            for course in courses:
+                bullet(course.subject_code + course.number, course.name)
+    else:
+        course = self.api.course(args.identifier)
+        if not course:
+            print(query + " is not a recognized course.")
+        else:
+            print(f"--- {course.number}: {course.name} ---")
+            if course.meeting_patterns:
+                print("Meeting schedule(s): " + ", ".join(course.meeting_patterns))
+            bullet('Professors', ', '.join(course.instructors))
+            bullet('School', course.school_name)
+            bullet('Registration available' , ('YES' if course.active else 'NO'))
+            bullet('Description')
+            print(course.raw_description)

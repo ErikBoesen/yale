@@ -1,3 +1,4 @@
 PyYAML
 termcolor
-yaledining==0.1.0
+yaledining
+yalecourses
