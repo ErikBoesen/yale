@@ -15,7 +15,7 @@ subparsers = parser.add_subparsers(help='Subcommand help', dest='subcommand', re
 parser_dining = subparsers.add_parser('dining')
 parser_dining.add_argument('location', nargs='?')
 parser_courses = subparsers.add_parser('courses')
-parser_courses.add_argument('identifier', nargs='?')
+parser_courses.add_argument('identifier')
 args = parser.parse_args()
 
 CREDENTIALS_PATH = os.path.expanduser('~') + '/.yale_credentials.yml'
