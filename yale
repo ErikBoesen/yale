@@ -22,7 +22,7 @@ CREDENTIALS_PATH = os.path.expanduser('~') + '/.yale_credentials.yml'
 credentials = {
     'NetID': '',
     'Password': '',
-    'api_key': '',
+    'yale_api_key': '',
 }
 if os.path.isfile(CREDENTIALS_PATH) and os.path.getsize(CREDENTIALS_PATH) is not 0:
     with open(CREDENTIALS_PATH, 'r') as f:
@@ -31,9 +31,9 @@ else:
     credentials['NetID'] = input('NetID: ')
     from getpass import getpass
     credentials['Password'] = getpass('Password: ')
+    credentials['yale_api_key'] = input('Yale API key (go to https://yale.dev.ca.com/admin/app/applications and add an application): ')
     with open(CREDENTIALS_PATH, 'w') as f:
         yaml.dump(credentials, f)
-    credentials['yale_api_key'] = input('Yale API key (go to https://yale.dev.ca.com/admin/app/applications and add an application): ')
     os.chmod(CREDENTIALS_PATH, stat.S_IRUSR | stat.S_IWUSR)
 
 # Warn if group or public can read config and the private details therein.
@@ -117,23 +117,23 @@ if args.subcommand == 'dining':
             print(colored(meal.date.strftime('%m/%d') + ' / ' + meal.name, 'blue', attrs=['underline']))
             for item in meal.items:
                 print('- ' + item.name)
-elif args.subcommand == 'course':
-    api = yalecourses.YaleCourses(config['yale_api_key'])
-    if api.is_course(args.identifier):
+elif args.subcommand == 'courses':
+    api = yalecourses.YaleCourses(credentials['yale_api_key'])
+    if yalecourses.is_subject(args.identifier):
         courses = api.courses(args.identifier)
         if not courses:
-            print(query + ' is not a recognized subject.')
+            print(args.identifier + ' is not a recognized subject.')
         else:
             for course in courses:
-                bullet(course.subject_code + course.number, course.name)
+                bullet(course.code, course.name)
     else:
-        course = self.api.course(args.identifier)
+        course = api.course(args.identifier)
         if not course:
-            print(query + " is not a recognized course.")
+            print(args.identifier + ' is not a recognized course.')
         else:
-            print(f"--- {course.number}: {course.name} ---")
+            bullet(course.code, course.name)
             if course.meeting_patterns:
-                print("Meeting schedule(s): " + ", ".join(course.meeting_patterns))
+                bullet('Meeting schedule(s)', ', '.join(course.meeting_patterns))
             bullet('Professors', ', '.join(course.instructors))
             bullet('School', course.school_name)
             bullet('Registration available' , ('YES' if course.active else 'NO'))
