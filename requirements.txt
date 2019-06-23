@@ -1,4 +1,6 @@
 PyYAML
 termcolor
+
 yaledining
 yalecourses
+yalebuildings

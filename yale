@@ -8,6 +8,7 @@ import requests
 from termcolor import colored, cprint
 import yaledining
 import yalecourses
+import yalebuildings
 
 parser = argparse.ArgumentParser(description='Perform Yale-related tasks')
 parser.add_argument('--debug', default=False, action='store_true', help='Output debug information')
@@ -16,6 +17,8 @@ parser_dining = subparsers.add_parser('dining')
 parser_dining.add_argument('location', nargs='?')
 parser_courses = subparsers.add_parser('courses')
 parser_courses.add_argument('identifier')
+parser_building = subparsers.add_parser('building')
+parser_building.add_argument('building_id')
 args = parser.parse_args()
 
 CREDENTIALS_PATH = os.path.expanduser('~') + '/.yale_credentials.yml'
@@ -139,3 +142,17 @@ elif args.subcommand == 'courses':
             bullet('Registration available' , ('YES' if course.active else 'NO'))
             bullet('Description')
             print(course.raw_description)
+elif args.subcommand == 'building':
+    api = yalebuildings.YaleBuildings(credentials['yale_api_key'])
+    building = api.building(args.building_id)
+    bullet(building.id, building.name)
+    if building.category:
+        bullet('Category', building.category)
+
+    bullet_list('Address', [building.address_1, building.address_2 + ' ' + building.address_3])
+    if building.latitude and building.longitude:
+        bullet('Coordinates', f'({building.latitude}, {building.longitude})')
+    if building.historical_name:
+        bullet('Historical name', building.historical_name)
+    if building.prose:
+        bullet('Fun facts', building.fun_facts)
