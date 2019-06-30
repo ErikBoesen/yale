@@ -5,4 +5,5 @@ yaledining
 yalecourses
 yalebuildings
 yaledirectory
-SelectMenu
+
+pick

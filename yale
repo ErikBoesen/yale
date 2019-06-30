@@ -11,7 +11,7 @@ import yalecourses
 import yalebuildings
 import yaledirectory
 import yaleorgdirectory
-from selectmenu import SelectMenu
+from pick import pick
 
 parser = argparse.ArgumentParser(description='Perform Yale-related tasks')
 parser.add_argument('--debug', default=False, action='store_true', help='Output debug information')
@@ -103,6 +103,13 @@ def bullet_list(title, details: list):
             print(',\n' + ' ' * len(title) + detail, end='')
         print()
 
+def log_organization(organization):
+    bullet('Name', organization.name)
+    bullet('Website', organization.website)
+    bullet('Address', organization.address)
+    bullet('Room', organization.room)
+    bullet('Telephone', organization.telephone)
+
 if args.subcommand == 'dining':
     api = yaledining.YaleDining()
     # Reshuffle into list of dicts for easy subscripting
@@ -174,14 +181,6 @@ elif args.subcommand == 'organizations':
         log_organization(organization)
     else:
         organizations = api.organizations(tags=args.tags)
-        menu = SelectMenu()
-        name = menu.add_choices([organization.name for name in organizations])
+        name, index = pick([organization.name for organization in organizations])
         organization = api.organization(name)
         log_organization(organization)
-
-def log_organization(organization):
-    bullet('Name', organization.name)
-    bullet('Website', organization.website)
-    bullet('Address', organization.address)
-    bullet('Room', organization.room)
-    bullet('Telephone', organization.telephone)
