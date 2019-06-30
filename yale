@@ -11,6 +11,7 @@ import yalecourses
 import yalebuildings
 import yaledirectory
 import yaleorgdirectory
+from selectmenu import SelectMenu
 
 parser = argparse.ArgumentParser(description='Perform Yale-related tasks')
 parser.add_argument('--debug', default=False, action='store_true', help='Output debug information')
@@ -170,13 +171,17 @@ elif args.subcommand == 'organizations':
     api = yaleorgdirectory.YaleOrgDirectory(credentials['yale_api_key'])
     if args.organization_name:
         organization = api.organization(args.organization_name)
-        print(organization)
-        bullet('Name', organization.name)
-        bullet('Website', organization.website)
-        bullet('Address', organization.address)
-        bullet('Room', organization.room)
-        bullet('Telephone', organization.telephone)
+        log_organization(organization)
     else:
-        organizations = api.organizations(tags=organizations.tags)
-        for organization in organizations:
-            bullet(organization.name, organization.address)
+        organizations = api.organizations(tags=args.tags)
+        menu = SelectMenu()
+        name = menu.add_choices([organization.name for name in organizations])
+        organization = api.organization(name)
+        log_organization(organization)
+
+def log_organization(organization):
+    bullet('Name', organization.name)
+    bullet('Website', organization.website)
+    bullet('Address', organization.address)
+    bullet('Room', organization.room)
+    bullet('Telephone', organization.telephone)
