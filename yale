@@ -9,6 +9,8 @@ from termcolor import colored, cprint
 import yaledining
 import yalecourses
 import yalebuildings
+import yaledirectory
+import yaleorgdirectory
 
 parser = argparse.ArgumentParser(description='Perform Yale-related tasks')
 parser.add_argument('--debug', default=False, action='store_true', help='Output debug information')
@@ -19,6 +21,11 @@ parser_courses = subparsers.add_parser('courses')
 parser_courses.add_argument('identifier')
 parser_building = subparsers.add_parser('building')
 parser_building.add_argument('building_id')
+parser_people = subparsers.add_parser('people')
+parser_people.add_argument('person_name')
+parser_organizations = subparsers.add_parser('organizations')
+parser_organizations.add_argument('organization_name', nargs='?')
+parser_organizations.add_argument('-t', dest='tags', nargs='*')
 args = parser.parse_args()
 
 CREDENTIALS_PATH = os.path.expanduser('~') + '/.yale_credentials.yml'
@@ -83,7 +90,8 @@ def capacity_bar(open, capacity):
     return colored(('▇' * capacity) + ('░' * (10 - capacity)), capacity_color(capacity))
 
 def bullet(title, details: str = ''):
-    print(colored(title + ': ', 'blue') + details)
+    if details:
+        print(colored(title + ': ', 'blue') + details)
 
 def bullet_list(title, details: list):
     # Make sure we don't log nothing
@@ -95,18 +103,18 @@ def bullet_list(title, details: list):
         print()
 
 if args.subcommand == 'dining':
-    dining = yaledining.YaleDining()
+    api = yaledining.YaleDining()
     # Reshuffle into list of dicts for easy subscripting
     type_symbols = {
         'Residential': '🏠',
         'Retail': '💰',
     }
     if args.location is None:
-        for location in dining.locations():
+        for location in api.locations():
             debug(location)
             print(colored(type_symbols[location.type] + ' ' + location.name, 'green' if location.open else 'grey') + ' ' + capacity_bar(location.open, location.capacity))
     else:
-        location = dining.location(args.location)
+        location = api.location(args.location)
         if location is None:
             error('Unknown location name.')
         print(colored('/' * 3 + ' ' + location.name + ' ' + '/' * 3, 'blue'))
@@ -139,7 +147,7 @@ elif args.subcommand == 'courses':
                 bullet('Meeting schedule(s)', ', '.join(course.meeting_patterns))
             bullet('Professors', ', '.join(course.instructors))
             bullet('School', course.school_name)
-            bullet('Registration available' , ('YES' if course.active else 'NO'))
+            bullet('Registration available', ('YES' if course.active else 'NO'))
             bullet('Description')
             print(course.raw_description)
 elif args.subcommand == 'building':
@@ -156,3 +164,19 @@ elif args.subcommand == 'building':
         bullet('Historical name', building.historical_name)
     if building.prose:
         bullet('Fun facts', building.fun_facts)
+elif args.subcommand == 'people':
+    pass
+elif args.subcommand == 'organizations':
+    api = yaleorgdirectory.YaleOrgDirectory(credentials['yale_api_key'])
+    if args.organization_name:
+        organization = api.organization(args.organization_name)
+        print(organization)
+        bullet('Name', organization.name)
+        bullet('Website', organization.website)
+        bullet('Address', organization.address)
+        bullet('Room', organization.room)
+        bullet('Telephone', organization.telephone)
+    else:
+        organizations = api.organizations(tags=organizations.tags)
+        for organization in organizations:
+            bullet(organization.name, organization.address)

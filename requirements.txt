@@ -4,3 +4,4 @@ termcolor
 yaledining
 yalecourses
 yalebuildings
+yaledirectory
