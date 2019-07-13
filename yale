@@ -18,6 +18,7 @@ parser.add_argument('--debug', default=False, action='store_true', help='Output 
 subparsers = parser.add_subparsers(help='Subcommand help', dest='subcommand', required=True)
 parser_dining = subparsers.add_parser('dining')
 parser_dining.add_argument('location', nargs='?')
+parser_dining.add_argument('--menu', action='store_true')
 parser_courses = subparsers.add_parser('courses')
 parser_courses.add_argument('identifier')
 parser_building = subparsers.add_parser('building')
@@ -60,7 +61,7 @@ if os.path.isfile(CONFIG_PATH) and os.path.getsize(CONFIG_PATH) is not 0:
 else:
     config = {key: input(key + ': ') for key in config.keys()}
     config.update({
-        # Nothing here yet
+        'show_closed': False,
     })
     with open(CONFIG_PATH, 'w') as f:
         yaml.dump(config, f)
@@ -126,9 +127,10 @@ if args.subcommand == 'dining':
                 print(colored(type_symbols[location.type] + ' ' + location.name, 'green') + ' ' + capacity_bar(location.open, location.capacity))
         else:
             print(colored('No dining locations open currently.', 'blue'))
-        locations_closed = [location for location in locations if location.closed]
-        if locations_closed:
-            print(colored('Closed: ' + ', '.join([location.name for location in locations_closed]), 'grey'))
+        if config['show_closed']:
+            locations_closed = [location for location in locations if location.closed]
+            if locations_closed:
+                print(colored('Closed: ' + ', '.join([location.name for location in locations_closed]), 'grey'))
     else:
         location = api.location(args.location)
         if location is None:
