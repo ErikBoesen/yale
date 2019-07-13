@@ -118,9 +118,17 @@ if args.subcommand == 'dining':
         'Retail': '💰',
     }
     if args.location is None:
-        for location in api.locations():
-            debug(location)
-            print(colored(type_symbols[location.type] + ' ' + location.name, 'green' if location.open else 'grey') + ' ' + capacity_bar(location.open, location.capacity))
+        locations = api.locations()
+        locations_open = [location for location in locations if location.open]
+        if locations_open:
+            for location in locations_open:
+                debug(location)
+                print(colored(type_symbols[location.type] + ' ' + location.name, 'green') + ' ' + capacity_bar(location.open, location.capacity))
+        else:
+            print(colored('No dining locations open currently.', 'blue'))
+        locations_closed = [location for location in locations if location.closed]
+        if locations_closed:
+            print(colored('Closed: ' + ', '.join([location.name for location in locations_closed]), 'grey'))
     else:
         location = api.location(args.location)
         if location is None:
