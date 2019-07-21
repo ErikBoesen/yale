@@ -1,9 +1,9 @@
 PyYAML
 termcolor
+pick
 
 yaledining
 yalecourses
 yalebuildings
 yaledirectory
-
-pick
+yalelaundry

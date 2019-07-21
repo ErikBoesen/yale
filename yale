@@ -6,28 +6,38 @@ import stat
 import sys
 import requests
 from termcolor import colored, cprint
+from pick import pick
 import yaledining
 import yalecourses
 import yalebuildings
 import yaledirectory
 import yaleorgdirectory
-from pick import pick
+import yalelaundry
 
 parser = argparse.ArgumentParser(description='Perform Yale-related tasks')
 parser.add_argument('--debug', default=False, action='store_true', help='Output debug information')
 subparsers = parser.add_subparsers(help='Subcommand help', dest='subcommand', required=True)
+
 parser_dining = subparsers.add_parser('dining', help='Get information about the dining locations currently open, their menus, etc.')
 parser_dining.add_argument('location', nargs='?', help='Name of location to get information about')
 parser_dining.add_argument('--menu', action='store_true', help='View a dining hall\'s full menu')
+
 parser_courses = subparsers.add_parser('courses', help='Get information about courses and subjects offered at Yale')
 parser_courses.add_argument('identifier', help='The course name or subject area to get information about')
+
 parser_building = subparsers.add_parser('building', help='Learn about the buildings on campus')
 parser_building.add_argument('building_id', help='The ID of the building to learn about')
+
 parser_people = subparsers.add_parser('people', help='Look up people in the Yale directory')
 parser_people.add_argument('person_name', help='Name of person to search for')
+
 parser_organizations = subparsers.add_parser('organizations', help='Research organizations and institutions on campus')
 parser_organizations.add_argument('organization_name', nargs='?', help='Name of organization to search for')
 parser_organizations.add_argument('-t', dest='tags', nargs='*', help='Tags to narrow your search')
+
+parser_laundry = subparsers.add_parser('laundry', help='Check the status of laundry rooms on campus')
+parser_laundry.add_argument('laundry_room', nargs='?', help='Name of laundry location')
+
 args = parser.parse_args()
 
 CREDENTIALS_PATH = os.path.expanduser('~') + '/.yale_credentials.yml'
@@ -95,7 +105,11 @@ def bullet(title, details: str = ''):
     if details:
         print(colored(title + ': ', 'blue') + details)
 
-def bullet_list(title, details: list):
+def bullet_list(points):
+    for point in points:
+        bullet(*point)
+
+def bullet_comma(title, details: list):
     # Make sure we don't log nothing
     if details:
         title += ': '
@@ -140,7 +154,7 @@ if args.subcommand == 'dining':
         bullet('Address', '{address} ({coordinates})'.format(address=location.address,
                                                              coordinates=location.geolocation))
         bullet('Phone', location.phone)
-        bullet_list('Managers', [f'{manager.name} ({manager.email})' for manager in location.managers])
+        bullet_comma('Managers', [f'{manager.name} ({manager.email})' for manager in location.managers])
         for meal in location.meals:
             print()
             print(colored(meal.date.strftime('%m/%d') + ' / ' + meal.name, 'blue', attrs=['underline']))
@@ -175,7 +189,7 @@ elif args.subcommand == 'building':
     if building.category:
         bullet('Category', building.category)
 
-    bullet_list('Address', [building.address_1, building.address_2 + ' ' + building.address_3])
+    bullet_comma('Address', [building.address_1, building.address_2 + ' ' + building.address_3])
     if building.latitude and building.longitude:
         bullet('Coordinates', f'({building.latitude}, {building.longitude})')
     if building.historical_name:
@@ -194,3 +208,18 @@ elif args.subcommand == 'organizations':
         name, index = pick([organization.name for organization in organizations])
         organization = api.organization(name)
         log_organization(organization)
+elif args.subcommand == 'laundry':
+    api = yalelaundry.YaleLaundry(credentials['yale_api_key'])
+    if not args.laundry_room:
+        rooms = api.rooms()
+        name, index = pick([room.name for room in rooms])
+        room = rooms[index]
+    else:
+        room = api.room(args.laundry_room)
+    use = room.use
+    items = [(room.name, f"({room.campus_name})")]
+    items += [("Washers available", f"{use.available.washers}/{use.total.washers}"),
+              ("Dryers available", f"{use.available.dryers}/{use.total.dryers}")]
+    for appliance in room.appliances:
+        items.append((f"{appliance.type} {appliance.number}", appliance.time_remaining_raw))
+    bullet_list(items)
