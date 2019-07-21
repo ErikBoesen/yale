@@ -217,7 +217,7 @@ elif args.subcommand == 'laundry':
     else:
         room = api.room(args.laundry_room)
     use = room.use
-    items = [(room.name, f"({room.campus_name})")]
+    print(colored(room.name, 'blue')
     items += [("Washers available", f"{use.available.washers}/{use.total.washers}"),
               ("Dryers available", f"{use.available.dryers}/{use.total.dryers}")]
     for appliance in room.appliances:
