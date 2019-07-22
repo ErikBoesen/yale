@@ -1,6 +1,7 @@
 PyYAML
 termcolor
 pick
+pyfiglet
 
 yaledining
 yalecourses
