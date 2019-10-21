@@ -146,7 +146,7 @@ if args.subcommand == 'dining':
         if locations_open:
             for location in locations_open:
                 debug(location)
-                print(colored(type_symbols[location.type] + ' ' + location.name, 'green') + ' ' + capacity_bar(location.is_open, location.capacity))
+                print(colored(type_symbols[location.type] + ' ' + location.name.ljust(16), 'green') + ' ' + capacity_bar(location.is_open, location.capacity))
         else:
             print(colored('No dining locations open currently.', 'blue'))
         if config['show_closed']:
