@@ -161,7 +161,12 @@ if args.subcommand == 'dining':
                                                                        latitude=hall.latitude,
                                                                        longitude=hall.longitude))
         bullet('Phone', hall.phone)
-        bullet_comma('Managers', [f'{manager.name} ({manager.email})' for manager in hall.managers])
+        bullet_comma('Managers', [
+            '{position}{name}{email}'.format(position=(manager.position + ': ') if manager.position else '',
+                                             name=position.name,
+                                             email='(' + position.email + ')' if position.email else '')
+            for manager in hall.managers
+        ])
         # TODO: support querying meals for other days
         for meal in hall.meals(datetime.date.today()):
             print()
