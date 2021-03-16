@@ -216,6 +216,7 @@ elif args.subcommand == 'organizations':
         name, index = pick([organization.name for organization in organizations])
         organization = api.organization(name)
         log_organization(organization)
+"""
 elif args.subcommand == 'laundry':
     api = yalelaundry.YaleLaundry(credentials['yale_api_key'])
     if not args.laundry_room:
@@ -231,3 +232,4 @@ elif args.subcommand == 'laundry':
     for appliance in room.appliances:
         items.append((f"{appliance.type} {appliance.number}", appliance.time_remaining_raw))
     bullet_list(items)
+"""
