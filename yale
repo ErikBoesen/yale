@@ -46,6 +46,7 @@ credentials = {
     'NetID': '',
     'Password': '',
     'yale_api_key': '',
+    'yalies_api_key': '',
 }
 if os.path.isfile(CREDENTIALS_PATH) and os.path.getsize(CREDENTIALS_PATH) is not 0:
     with open(CREDENTIALS_PATH, 'r') as f:
@@ -55,6 +56,7 @@ else:
     from getpass import getpass
     credentials['Password'] = getpass('Password: ')
     credentials['yale_api_key'] = input('Yale API key (go to https://yale.dev.ca.com/admin/app/applications and add an application): ')
+    credentials['yalies_api_key'] = input('Yalies API key (from https://yalies.io/apidocs): ')
     with open(CREDENTIALS_PATH, 'w') as f:
         yaml.dump(credentials, f)
     os.chmod(CREDENTIALS_PATH, stat.S_IRUSR | stat.S_IWUSR)
