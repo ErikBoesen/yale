@@ -3,8 +3,9 @@ termcolor
 pick
 pyfiglet
 
+yalies
+
 yaledining
 yalecourses
 yalebuildings
-yaledirectory
 yalelaundry
