@@ -4,8 +4,8 @@ pick
 pyfiglet
 
 yalies
-
 yaledining
+
 yalecourses
 yalebuildings
 yalelaundry

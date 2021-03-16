@@ -15,7 +15,7 @@ import yaledirectory
 import yaleorgdirectory
 import yalelaundry
 
-parser = argparse.ArgumentParser(description='Perform Yale-related tasks')
+parser = argparse.ArgumentParser(description='The CLI tool for life at Yale.')
 parser.add_argument('--debug', default=False, action='store_true', help='Output debug information')
 subparsers = parser.add_subparsers(help='Subcommand help', dest='subcommand', required=True)
 
@@ -41,7 +41,7 @@ parser_organizations.add_argument('-t', dest='tags', nargs='*', help='Tags to na
 
 args = parser.parse_args()
 
-CREDENTIALS_PATH = os.path.expanduser('~') + '/.yale_credentials.yml'
+CREDENTIALS_PATH = os.environ['HOME'] + '/.yale_credentials.yml'
 credentials = {
     'NetID': '',
     'Password': '',
