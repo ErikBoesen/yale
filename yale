@@ -8,10 +8,10 @@ import requests
 from termcolor import colored, cprint
 from pick import pick
 from pyfiglet import Figlet
+import yalies
 import yaledining
 import yalecourses
 import yalebuildings
-import yaledirectory
 import yaleorgdirectory
 import yalelaundry
 
@@ -80,6 +80,7 @@ else:
     with open(CONFIG_PATH, 'w') as f:
         yaml.dump(config, f)
 
+
 def debug(content):
     """
     Log debug output if enabled.
@@ -88,6 +89,7 @@ def debug(content):
     if args.debug:
         print(content)
 
+
 def error(content):
     """
     Log errors.
@@ -95,19 +97,23 @@ def error(content):
     """
     print(colored(content, 'red'), file=sys.stderr)
 
+
 def occupancy_color(occupancy):
     if occupancy > 7: return 'red'
     if occupancy > 5: return 'yellow'
     return 'green'
+
 
 def occupancy_bar(open, occupancy):
     if not open or occupancy is None:
         return ''
     return colored(('▇' * occupancy) + ('░' * (10 - occupancy)), occupancy_color(occupancy))
 
+
 def bullet_simple(title=None):
     if title:
         print(colored(title + ': ', 'blue'))
+
 
 def bullet(title, details=None):
     if details:
@@ -115,9 +121,11 @@ def bullet(title, details=None):
             details = str(details)
         print(colored(title + ': ', 'blue') + details)
 
+
 def bullet_list(points):
     for point in points:
         bullet(*point)
+
 
 def bullet_comma(title, details: list):
     # Make sure we don't log nothing
@@ -133,6 +141,7 @@ def title(text):
     if config['figlet']:
         text = figlet.renderText(text)
     print(colored(text, 'blue'))
+
 
 def log_person(person):
     # TODO: show full name
@@ -251,7 +260,14 @@ elif args.subcommand == 'building':
     if building.prose:
         bullet('Fun facts', building.fun_facts)
 elif args.subcommand == 'people':
-    pass
+    api = yalies.API(config['yalies_api_key'])
+    people = api.people(query=args.query)
+    if len(people) == 1:
+        person = people[0]
+        log_person(person)
+    for person in people:
+        # TODO: give more brief logs if there are lots of people
+        log_person(person)
 elif args.subcommand == 'organizations':
     api = yaleorgdirectory.YaleOrgDirectory(credentials['yale_api_key'])
     if args.organization_name:
