@@ -19,8 +19,8 @@ parser = argparse.ArgumentParser(description='The CLI tool for life at Yale.')
 parser.add_argument('--debug', default=False, action='store_true', help='Output debug information')
 subparsers = parser.add_subparsers(help='Subcommand help', dest='subcommand', required=True)
 
-parser_dining = subparsers.add_parser('dining', help='Get information about the dining locations currently open, their menus, etc.')
-parser_dining.add_argument('location', nargs='?', help='Name of location to get information about')
+parser_dining = subparsers.add_parser('dining', help='Get information about the dining halls currently open, their menus, etc.')
+parser_dining.add_argument('hall', nargs='?', help='Name or abbreviation of hall to get information about')
 parser_dining.add_argument('--menu', action='store_true', help='View a dining hall\'s full menu')
 
 parser_courses = subparsers.add_parser('courses', help='Get information about courses and subjects offered at Yale')
@@ -65,7 +65,7 @@ else:
 if os.stat(CREDENTIALS_PATH).st_mode & (stat.S_IRGRP | stat.S_IROTH):
     print('Warning: config file may be accessible by other users.', file=sys.stderr)
 
-CONFIG_PATH = os.path.expanduser('~') + '/.yale.yml'
+CONFIG_PATH = os.environ['HOME'] + '/.yale.yml'
 config = {
 }
 if os.path.isfile(CONFIG_PATH) and os.path.getsize(CONFIG_PATH) is not 0:
@@ -95,15 +95,15 @@ def error(content):
     """
     print(colored(content, 'red'), file=sys.stderr)
 
-def capacity_color(capacity):
-    if capacity > 7: return 'red'
-    if capacity > 5: return 'yellow'
+def occupancy_color(occupancy):
+    if occupancy > 7: return 'red'
+    if occupancy > 5: return 'yellow'
     return 'green'
 
-def capacity_bar(open, capacity):
-    if not open or capacity is None:
+def occupancy_bar(open, occupancy):
+    if not open or occupancy is None:
         return ''
-    return colored(('▇' * capacity) + ('░' * (10 - capacity)), capacity_color(capacity))
+    return colored(('▇' * occupancy) + ('░' * (10 - occupancy)), occupancy_color(occupancy))
 
 def bullet(title, details: str = ''):
     if details:
@@ -137,35 +137,32 @@ def log_organization(organization):
 
 if args.subcommand == 'dining':
     api = yaledining.YaleDining()
-    # Reshuffle into list of dicts for easy subscripting
-    type_symbols = {
-        'Residential': '🏠',
-        'Retail': '💰',
-    }
-    if args.location is None:
-        locations = api.locations()
-        locations_open = [location for location in locations if location.is_open]
-        if locations_open:
-            for location in locations_open:
-                debug(location)
-                print(colored(type_symbols[location.type] + ' ' + location.name.ljust(16), 'green') + ' ' + capacity_bar(location.is_open, location.capacity))
+    if args.hall is None:
+        halls = api.halls()
+        halls_open = [hall for hall in halls if hall.open]
+        if halls_open:
+            for hall in halls_open:
+                debug(hall)
+                print(colored(hall.name.ljust(16), 'green') + ' ' + occupancy_bar(hall.open, hall.occupancy))
         else:
-            print(colored('No dining locations open currently.', 'blue'))
+            print(colored('No dining halls open currently.', 'blue'))
         if config['show_closed']:
-            locations_closed = [location for location in locations if location.closed]
-            if locations_closed:
-                print(colored('Closed: ' + ', '.join([location.name for location in locations_closed]), 'grey'))
+            halls_closed = [hall for hall in halls if not hall.open]
+            if halls_closed:
+                print(colored('Closed: ' + ', '.join([hall.name for hall in halls_closed]), 'grey'))
     else:
-        location = api.location(args.location)
-        if location is None:
-            error('Unknown location name.')
-        print(colored('/' * 3 + ' ' + location.name + ' ' + '/' * 3, 'blue'))
+        # TODO: support name or abbreviation
+        hall = api.hall(args.hall)
+        if hall is None:
+            error('Unknown hall name or abbreviation.')
+        print(colored('/' * 3 + ' ' + hall.name + ' ' + '/' * 3, 'blue'))
         print()
-        bullet('Address', '{address} ({coordinates})'.format(address=location.address,
-                                                             coordinates=location.geolocation))
-        bullet('Phone', location.phone)
-        bullet_comma('Managers', [f'{manager.name} ({manager.email})' for manager in location.managers])
-        for meal in location.meals:
+        bullet('Address', '{address} ({coordinates})'.format(address=hall.address,
+                                                             coordinates=hall.geolocation))
+        bullet('Phone', hall.phone)
+        bullet_comma('Managers', [f'{manager.name} ({manager.email})' for manager in hall.managers])
+        # TODO: support querying meals for other days
+        for meal in hall.meals(datetime.date.today()):
             print()
             print(colored(meal.date.strftime('%m/%d') + ' / ' + meal.name, 'blue', attrs=['underline']))
             for item in meal.items:
