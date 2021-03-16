@@ -30,7 +30,7 @@ parser_building = subparsers.add_parser('building', help='Learn about the buildi
 parser_building.add_argument('building_id', help='The ID of the building to learn about')
 
 parser_people = subparsers.add_parser('people', help='Look up people at Yale')
-parser_people.add_argument('person_name', help='Name of person to search for')
+parser_people.add_argument('query', help='Name of person to search for')
 
 parser_organizations = subparsers.add_parser('organizations', help='Research organizations and institutions on campus')
 parser_organizations.add_argument('organization_name', nargs='?', help='Name of organization to search for')
@@ -105,8 +105,14 @@ def occupancy_bar(open, occupancy):
         return ''
     return colored(('▇' * occupancy) + ('░' * (10 - occupancy)), occupancy_color(occupancy))
 
-def bullet(title, details: str = ''):
+def bullet_simple(title=None):
+    if title:
+        print(colored(title + ': ', 'blue'))
+
+def bullet(title, details=None):
     if details:
+        if type(details) != str:
+            details = str(details)
         print(colored(title + ': ', 'blue') + details)
 
 def bullet_list(points):
@@ -127,6 +133,41 @@ def title(text):
     if config['figlet']:
         text = figlet.renderText(text)
     print(colored(text, 'blue'))
+
+def log_person(person):
+    # TODO: show full name
+    bullet('Name', f'{person.first_name} {person.last_name}')
+    bullet('Pronouns', person.pronouns)
+    bullet('Title', person.title)
+    bullet('NetID', person.netid)
+    bullet('UPI', person.upi)
+    bullet('Phone', person.phone)
+    bullet('Address', person.address)
+    # Students
+    if person.school_code:
+        bullet('School', f'{person.school} ({person.school_code})')
+        bullet('Year', f'{person.year} (Took Leave)' if person.leave else person.year)
+        if person.school_code == 'YC':
+            bullet('College', person.college)
+            if person.eli_whitney:
+                bullet('Eli Whitney', 'Yes')
+            bullet('Birthday', person.birthday)
+            bullet('Residence', person.residence)
+            bullet('Access Code', person.access_code)
+    else:
+        if person.organization:
+            bullet('Organization', f'{person.organization} ({person.organization_code})')
+        if person.unit:
+            bullet('Unit', f'{person.unit} ({person.unit_class}/{person.unit_code})')
+        bullet('Postal Address', person.postal_address)
+        bullet('Office Buliding', person.office_building)
+        bullet('Office Room', person.office_room)
+        bullet('CV', person.cv)
+        bullet('Department Profile', person.profile_url)
+        bullet('Website', person.website)
+        bullet('Education', person.education)
+        bullet('Publications', person.publications)
+
 
 def log_organization(organization):
     bullet('Name', organization.name)
@@ -164,7 +205,7 @@ if args.subcommand == 'dining':
         bullet_comma('Managers', [
             '{position}{name}{email}'.format(position=(manager.position + ': ') if manager.position else '',
                                              name=position.name,
-                                             email='(' + position.email + ')' if position.email else '')
+                                             email=' (' + position.email + ')' if position.email else '')
             for manager in hall.managers
         ])
         # TODO: support querying meals for other days
