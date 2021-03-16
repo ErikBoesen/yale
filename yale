@@ -55,8 +55,8 @@ else:
     credentials['NetID'] = input('NetID: ')
     from getpass import getpass
     credentials['Password'] = getpass('Password: ')
-    credentials['yale_api_key'] = input('Yale API key (go to https://yale.dev.ca.com/admin/app/applications and add an application): ')
-    credentials['yalies_api_key'] = input('Yalies API key (from https://yalies.io/apidocs): ')
+    credentials['yale_api_key'] = getpass('Yale API key (go to https://yale.dev.ca.com/admin/app/applications and add an application): ')
+    credentials['yalies_api_key'] = getpass('Yalies API key (from https://yalies.io/apidocs): ')
     with open(CREDENTIALS_PATH, 'w') as f:
         yaml.dump(credentials, f)
     os.chmod(CREDENTIALS_PATH, stat.S_IRUSR | stat.S_IWUSR)
