@@ -157,8 +157,9 @@ if args.subcommand == 'dining':
             error('Unknown hall name or abbreviation.')
         print(colored('/' * 3 + ' ' + hall.name + ' ' + '/' * 3, 'blue'))
         print()
-        bullet('Address', '{address} ({coordinates})'.format(address=hall.address,
-                                                             coordinates=hall.geolocation))
+        bullet('Address', '{address} ({latitude}, {longitude})'.format(address=hall.address,
+                                                                       latitude=hall.latitude,
+                                                                       longitude=hall.longitude))
         bullet('Phone', hall.phone)
         bullet_comma('Managers', [f'{manager.name} ({manager.email})' for manager in hall.managers])
         # TODO: support querying meals for other days
