@@ -213,14 +213,14 @@ if args.subcommand == 'dining':
         bullet('Phone', hall.phone)
         bullet_comma('Managers', [
             '{position}{name}{email}'.format(position=(manager.position + ': ') if manager.position else '',
-                                             name=position.name,
-                                             email=' (' + position.email + ')' if position.email else '')
+                                             name=manager.name,
+                                             email=' (' + manager.email + ')' if manager.email else '')
             for manager in hall.managers
         ])
         # TODO: support querying meals for other days
         for meal in hall.meals(datetime.date.today()):
             print()
-            print(colored(meal.date.strftime('%m/%d') + ' / ' + meal.name, 'blue', attrs=['underline']))
+            print(colored(meal.date + ' / ' + meal.name, 'blue', attrs=['underline']))
             for item in meal.items:
                 print('- ' + item.name)
 elif args.subcommand == 'courses':
