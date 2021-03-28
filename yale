@@ -4,7 +4,7 @@ import os
 import yaml
 import stat
 import sys
-import requests
+import datetime
 from termcolor import colored, cprint
 from pick import pick
 from pyfiglet import Figlet
