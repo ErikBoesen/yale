@@ -48,7 +48,7 @@ credentials = {
     'yale_api_key': '',
     'yalies_api_key': '',
 }
-if os.path.isfile(CREDENTIALS_PATH) and os.path.getsize(CREDENTIALS_PATH) is not 0:
+if os.path.isfile(CREDENTIALS_PATH) and os.path.getsize(CREDENTIALS_PATH) != 0:
     with open(CREDENTIALS_PATH, 'r') as f:
         credentials = yaml.load(f, Loader=yaml.SafeLoader)
 else:
@@ -68,7 +68,7 @@ if os.stat(CREDENTIALS_PATH).st_mode & (stat.S_IRGRP | stat.S_IROTH):
 CONFIG_PATH = os.environ['HOME'] + '/.yale.yml'
 config = {
 }
-if os.path.isfile(CONFIG_PATH) and os.path.getsize(CONFIG_PATH) is not 0:
+if os.path.isfile(CONFIG_PATH) and os.path.getsize(CONFIG_PATH) != 0:
     with open(CONFIG_PATH, 'r') as f:
         config = yaml.load(f, Loader=yaml.SafeLoader)
 else:
