@@ -186,7 +186,7 @@ def log_organization(organization):
     bullet('Telephone', organization.telephone)
 
 if args.subcommand == 'dining':
-    api = yaledining.YaleDining()
+    api = yaledining.API()
     if args.hall is None:
         halls = api.halls()
         halls_open = [hall for hall in halls if hall.open]
