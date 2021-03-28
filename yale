@@ -199,7 +199,7 @@ if args.subcommand == 'dining':
         if config['show_closed']:
             halls_closed = [hall for hall in halls if not hall.open]
             if halls_closed:
-                print(colored('Closed: ' + ', '.join([hall.name for hall in halls_closed]), 'grey'))
+                print(colored('Closed: ' + ', '.join([hall.name for hall in halls_closed]), 'red'))
     else:
         # TODO: support name or abbreviation
         hall = api.hall(args.hall)
