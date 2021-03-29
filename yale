@@ -193,7 +193,7 @@ if args.subcommand == 'dining':
         if halls_open:
             for hall in halls_open:
                 debug(hall)
-                print(colored(hall.name.ljust(16), 'green') + ' ' + occupancy_bar(hall.open, hall.occupancy))
+                print(colored(hall.nickname.ljust(10), 'blue') + ' ' + occupancy_bar(hall.open, hall.occupancy))
         else:
             print(colored('No dining halls open currently.', 'blue'))
         if config['show_closed']:
