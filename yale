@@ -260,7 +260,7 @@ elif args.subcommand == 'building':
     if building.prose:
         bullet('Fun facts', building.fun_facts)
 elif args.subcommand == 'people':
-    api = yalies.API(config['yalies_api_key'])
+    api = yalies.API(credentials['yalies_api_key'])
     people = api.people(query=args.query)
     if len(people) == 1:
         person = people[0]
